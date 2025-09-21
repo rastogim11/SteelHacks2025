@@ -135,9 +135,21 @@ export function ProductTesting() {
         }
 
         responseData = await response.json();
+
+        const toPercent = (value: number) => Math.round(value * 100);
+        const apiResults: Results = {
+          prediction: responseData.prediction,
+          fusedProbability: toPercent(responseData.probability),
+          imageProbability: responseData.probability ? toPercent(responseData.probability) : undefined,
+          dataProbability: responseData.dataProbability ? toPercent(responseData.dataProbability) : undefined,
+          gradCamUrl: responseData.gradCamUrl,
+          shapFeatures: responseData.shapFeatures,
+};
       } else {
         throw new Error("Only image input is supported right now.");
       }
+
+
 
       const apiResults: Results = {
         prediction: responseData.prediction,
@@ -229,7 +241,7 @@ export function ProductTesting() {
                             onClick={() => handleInputTypeChange(type.value)}
                             className={`p-6 rounded-2xl border-2 transition-all ${
                               inputType === type.value
-                                ? 'border-primary bg-primary/10'
+                                ? 'border-priamary bg-primary/10'
                                 : 'border-muted hover:border-primary/50'
                             }`}
                           >
@@ -451,7 +463,7 @@ export function ProductTesting() {
                   {/* Prediction Result */}
                   <div className="text-center p-6 bg-muted/30 rounded-2xl">
                     <Badge 
-                      variant={results.prediction === 'Healthy' ? 'success' : 'destructive'}
+                      variant={results.prediction === 'Benign' ? 'success' : 'Malignant'}
                       className="text-lg px-4 py-2 mb-4"
                     >
                       {results.prediction}

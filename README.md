@@ -1,11 +1,7 @@
 **Welcome to SemiColon!**
 
+To run the backend, be on the project/backend and run:
+    uvicorn main:app --reload --port 8000
 
 To run the application start the frontend by being the
-    project directory: run npm run dev
-
-Then inside project/backend:
-    run python -c "import model; model.train_and_save()"
-        trains the data on our pre-uploaded dataset
-    run python app.py
-        to run everything together
+    project directory: npm run dev
