@@ -106,35 +106,49 @@ export function ProductTesting() {
     return false;
   };
 
-  const simulateAPICall = async () => {
+  const callBackendAPI = async () => {
     setIsLoading(true);
     setProgress(0);
     setError('');
 
     try {
-      // Simulate progress
+      // Simulate progress updates while waiting for backend
       const intervals = [20, 40, 60, 80, 100];
       for (const targetProgress of intervals) {
-        await new Promise(resolve => setTimeout(resolve, 800));
+        await new Promise(resolve => setTimeout(resolve, 500));
         setProgress(targetProgress);
       }
 
-      // Simulate results
-      const mockResults: Results = {
-        prediction: Math.random() > 0.5 ? 'Benign' : 'Malignant',
-        fusedProbability: Math.floor(Math.random() * 40 + 30),
-        imageProbability: inputType !== 'data' ? Math.floor(Math.random() * 40 + 30) : undefined,
-        dataProbability: inputType !== 'image' ? Math.floor(Math.random() * 40 + 30) : undefined,
-        gradCamUrl: inputType !== 'data' ? 'https://images.pexels.com/photos/356040/pexels-photo-356040.jpeg?auto=compress&cs=tinysrgb&w=400' : undefined,
-        shapFeatures: inputType !== 'image' ? [
-          { feature: 'Radius Mean', importance: 0.8, type: 'positive' },
-          { feature: 'Texture Mean', importance: -0.6, type: 'negative' },
-          { feature: 'Area Mean', importance: 0.4, type: 'positive' },
-          { feature: 'Smoothness Mean', importance: -0.3, type: 'negative' },
-        ] : undefined,
+      let responseData: any;
+
+      if (inputType === 'image' && imageFile) {
+        const formData = new FormData();
+        formData.append("file", imageFile);
+
+        const response = await fetch("http://localhost:8000/predict", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error("Backend error while processing image.");
+        }
+
+        responseData = await response.json();
+      } else {
+        throw new Error("Only image input is supported right now.");
+      }
+
+      const apiResults: Results = {
+        prediction: responseData.prediction,
+        fusedProbability: responseData.probability,
+        imageProbability: responseData.probability,
+        gradCamUrl: undefined,
+        shapFeatures: undefined,
+        dataProbability: undefined,
       };
 
-      setResults(mockResults);
+      setResults(apiResults);
     } catch (err) {
       setError('Failed to process your request. Please try again.');
     } finally {
@@ -263,7 +277,7 @@ export function ProductTesting() {
                                     step="0.01"
                                     placeholder={field.placeholder}
                                     value={tabularData[field.key]}
-                                    onChange={(e) =>
+                                    onChange={(e: { target: { value: any; }; }) =>
                                       setTabularData(prev => ({
                                         ...prev,
                                         [field.key]: e.target.value
@@ -404,7 +418,7 @@ export function ProductTesting() {
                           Back
                         </Button>
                         <Button
-                          onClick={simulateAPICall}
+                          onClick={callBackendAPI}
                           disabled={isLoading}
                           className="min-w-32"
                         >
@@ -437,7 +451,7 @@ export function ProductTesting() {
                   {/* Prediction Result */}
                   <div className="text-center p-6 bg-muted/30 rounded-2xl">
                     <Badge 
-                      variant={results.prediction === 'Benign' ? 'success' : 'destructive'}
+                      variant={results.prediction === 'Healthy' ? 'success' : 'destructive'}
                       className="text-lg px-4 py-2 mb-4"
                     >
                       {results.prediction}
