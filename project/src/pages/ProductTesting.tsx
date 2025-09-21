@@ -136,28 +136,18 @@ export function ProductTesting() {
 
         responseData = await response.json();
 
-        const toPercent = (value: number) => Math.round(value * 100);
-        const apiResults: Results = {
-          prediction: responseData.prediction,
-          fusedProbability: toPercent(responseData.probability),
-          imageProbability: responseData.probability ? toPercent(responseData.probability) : undefined,
-          dataProbability: responseData.dataProbability ? toPercent(responseData.dataProbability) : undefined,
-          gradCamUrl: responseData.gradCamUrl,
-          shapFeatures: responseData.shapFeatures,
-};
       } else {
         throw new Error("Only image input is supported right now.");
       }
 
 
-
       const apiResults: Results = {
-        prediction: responseData.prediction,
-        fusedProbability: responseData.probability,
-        imageProbability: responseData.probability,
-        gradCamUrl: undefined,
-        shapFeatures: undefined,
-        dataProbability: undefined,
+          prediction: responseData.prediction,
+          fusedProbability: (responseData.probability),
+          imageProbability: responseData.probability ? (responseData.probability) : undefined,
+          dataProbability: responseData.dataProbability ? (responseData.dataProbability) : undefined,
+          gradCamUrl: responseData.gradCamUrl,
+          shapFeatures: responseData.shapFeatures,
       };
 
       setResults(apiResults);
